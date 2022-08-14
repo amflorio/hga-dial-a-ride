@@ -1,0 +1,26 @@
+SYSTEM = x86-64_osx
+LIBFORMAT = static_pic
+
+CCC = clang++ -O2 -Wall -std=c++11
+CCOPT = -m64 -fPIC -fexceptions -stdlib=libc++ -c
+
+CCLNDIRS = -L./blossom
+CCLNFLAGS = -m64 -lm -lpthread -framework CoreFoundation -framework IOKit -stdlib=libc++ -lblossom
+
+CCFLAGS = $(CCOPT)
+
+SOURCES=AssignmentPG.cpp Dijkstra.cpp FESI.cpp Graph.cpp Group.cpp Instance.cpp Partition.cpp PartitionLambdaForest.cpp PruneGreedy.cpp Route.cpp TSPHeuristic.cpp main.cpp
+OBJECTS=$(SOURCES:.cpp=.o)
+	EXECUTABLE=main
+
+all: $(SOURCES) $(EXECUTABLE)
+
+$(EXECUTABLE): $(OBJECTS)
+	$(CCC) $(CCLNDIRS) $(CCLNFLAGS) $(OBJECTS) -o $@
+
+.cpp.o:
+	$(CCC) $(CCFLAGS) $< -o $@
+
+clean:
+	/bin/rm -rf *.o
+

@@ -1,0 +1,26 @@
+SYSTEM = x86-64_linux
+LIBFORMAT = static_pic
+
+CCC = g++ -O2 -Wall
+CCOPT = -std=c++11 -m64 -fPIC -fno-strict-aliasing -fexceptions
+
+CCLNDIRS = -L./blossom -L/home/mdflorio/boost/lib
+CCLNFLAGS = -lm -lpthread -ldl -lblossom
+
+CCFLAGS = $(CCOPT) -I/home/mdflorio/boost/include
+
+SOURCES=AssignmentPG.cpp Dijkstra.cpp FESI.cpp Graph.cpp Group.cpp Instance.cpp Partition.cpp PartitionLambdaForest.cpp PruneGreedy.cpp Route.cpp TSPHeuristic.cpp main.cpp
+OBJECTS=$(SOURCES:.cpp=.o)
+	EXECUTABLE=main
+
+all: $(SOURCES) $(EXECUTABLE)
+
+$(EXECUTABLE): $(OBJECTS)
+	$(CCC) $(CCFLAGS) $(CCLNDIRS) $(OBJECTS) -o $@ $(CCLNFLAGS)
+
+.cpp.o:
+	$(CCC) -c $(CCFLAGS) $< -o $@
+
+clean:
+	/bin/rm -rf *.o
+
