@@ -52,7 +52,8 @@ void initMemory(int n) {
     sum2s = new double[MAX_HEIGHT+1];
     sum2s[0] = 0.0;
     for(int i=1; i<=MAX_HEIGHT; ++i)
-        sum2s[i] = sum2s[i-1] + exp2s[i];
+                                // fixing bug from original code:
+        sum2s[i] = sum2s[i-1] + (i<MAX_HEIGHT ? exp2s[i] : 0);
 }
 
 void freeMemory() {
