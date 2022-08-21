@@ -3,6 +3,7 @@
 #include <numeric>
 #include "Arc.h"
 #include "AssignmentPG.h"
+#include "Config.h"
 #include "Dijkstra.h"
 #include "FESI.h"
 #include "Instance.h"
@@ -90,6 +91,7 @@ int main(int argc, char* argv[]) {
     }
     auto I=make_shared<Instance>();
     shareInstance(I);
+    Config::PrintConfigParameters();
     if (argv[1]==string("ny")) {
         I->setCode("NY");
         I->loadNetwork("../in/coords/Manhattan.xy", "../in/dists/Manhattan.d");

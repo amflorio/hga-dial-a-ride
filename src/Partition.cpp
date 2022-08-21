@@ -1,6 +1,7 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
+#include "Config.h"
 #include "Instance.h"
 #include "Graph.h"
 #include "Partition.h"
@@ -135,10 +136,23 @@ Partition::wresult_t Partition::w(const cluster_t& c1, const cluster_t& c2) {
 }
 
 double Partition::w1(const Group& g1, const Group& g2) {
-    Group un=g1;
-    for (const auto& r : g2)
-        un.insert(r);
-    return MST_st(un)-MST_st(g1)-MST_st(g2);
+    if (Config::EXACT_W1) {
+        Group un=g1;
+        for (const auto& r : g2)
+            un.insert(r);
+        return MST_st(un)-MST_st(g1)-MST_st(g2);
+    } else {
+        double min_s=numeric_limits<double>::infinity();
+        double min_t=numeric_limits<double>::infinity();
+        for (const auto& r1 : g1)
+            for (const auto& r2 : g2) {
+                if (I->cost(r1.s, r2.s)<min_s)
+                    min_s=I->cost(r1.s, r2.s);
+                if (I->cost(r1.t, r2.t)<min_t)
+                    min_t=I->cost(r1.t, r2.t);
+            }
+        return min_s+min_t;
+    }
 }
 
 double Partition::w2(const Group& g1, const Group& g2) {
