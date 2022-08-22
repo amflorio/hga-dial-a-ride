@@ -14,8 +14,8 @@ vector<pair<size_t, size_t>> Graph::bucketMatching() const {
         return log(x)/log(1.05);    // use small base to yield more buckets
     };
     auto get_bucket=[&my_log](double c){
-        assert(c>=0);
-        return (int)my_log(1+c);
+        assert(Config::EXACT_W1 || c>=0);
+        return (int)my_log(1+max(c, 0.0));
     };
     vector<pair<size_t, size_t>> matching;
     vector<size_t> matched(N, 0);
@@ -39,6 +39,7 @@ vector<pair<size_t, size_t>> Graph::bucketMatching() const {
                 remaining-=2;
             }
         cout<<"remaining to match after bucket "<<b<<": "<<remaining<<endl;
+        bucket.clear();
     }
     return matching;
 }
