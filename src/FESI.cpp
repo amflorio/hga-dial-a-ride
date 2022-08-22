@@ -90,7 +90,7 @@ void randomization() {
     for(int i=0; i<nV; ++i) {
         pi[i] = i;
     }
-    auto re=default_random_engine {42};
+    auto re=default_random_engine {random_device()()};
     shuffle(pi, pi+nV, re);
     for(int i=0; i<nV; ++i) {
         reverse_pi[pi[i]] = i;
