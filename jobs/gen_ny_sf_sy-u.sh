@@ -32,3 +32,5 @@ for req in $REQS; do
     done
 done
 
+echo 'wait' >> $JOBS_FILE
+
