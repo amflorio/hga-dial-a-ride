@@ -50,36 +50,34 @@ vector<Group> Partition::partition() {
         cout<<"iteration: "<<iter<<" ;  M.size(): "<<M.size()<<endl;
         if (M.size()%2==1)
             M.push_back(cluster_t());       // virtual
-        vector<vector<wresult_t>> W(M.size(), vector<wresult_t>(M.size()));
         Graph G(M.size());
         for (size_t i=0; i<M.size(); ++i)
-            for (size_t j=i+1; j<M.size(); ++j) {
-                W[i][j]=w(M[i], M[j]);
-                G.setEdgeCost(i, j, W[i][j].val);
-            }
+            for (size_t j=i+1; j<M.size(); ++j)
+                G.setEdgeCost(i, j, w_val(M[i], M[j]));
         cout<<"finding minimum cost matching ..."<<endl;
         auto mcm=G.minCostMatching();
         collection_t newM;
         for (const auto& match : mcm) {
             const auto& a=match.first;
             const auto& b=match.second;
+            auto w_ab=w(M[a], M[b]);
             /*
-            cout<<a<<" -- "<<b<<"  type: "<<(W[a][b].w==
-                    wresult_t::which_w::w1?"w1":W[a][b].w==
+            cout<<a<<" -- "<<b<<"  type: "<<(w_ab.w==
+                    wresult_t::which_w::w1?"w1":w_ab.w==
                     wresult_t::which_w::w2?"w2":"virtual")<<"  op1: "
-                    <<W[a][b].g1<<"  op2: "<<W[a][b].g2<<endl;
+                    <<w_ab.g1<<"  op2: "<<w_ab.g2<<endl;
             */
-            if (W[a][b].w==wresult_t::which_w::w1) {
-                newM.push_back({W[a][b].g1});
-                for (const auto& r : W[a][b].g2)
+            if (w_ab.w==wresult_t::which_w::w1) {
+                newM.push_back({w_ab.g1});
+                for (const auto& r : w_ab.g2)
                     newM.back()[0].insert(r);
                 for (const auto& g : M[a])
-                    if (!g.count(*W[a][b].g1.begin()))
+                    if (!g.count(*w_ab.g1.begin()))
                         newM.back().push_back(g);
                 for (const auto& g : M[b])
-                    if (!g.count(*W[a][b].g2.begin()))
+                    if (!g.count(*w_ab.g2.begin()))
                         newM.back().push_back(g);
-            } else if (W[a][b].w==wresult_t::which_w::w2) {
+            } else if (w_ab.w==wresult_t::which_w::w2) {
                 newM.push_back(M[a]);
                 newM.back().insert(newM.back().end(), M[b].begin(), M[b].end());
             } else {        // matched with virtual cluster
@@ -133,6 +131,26 @@ Partition::wresult_t Partition::w(const cluster_t& c1, const cluster_t& c2) {
         }
     }
     return minimum;
+}
+
+double Partition::w_val(const cluster_t& c1, const cluster_t& c2) {
+    assert(!c1.empty());
+    if (c2.empty())     // dummy?
+        return 0;
+    double min=numeric_limits<double>::infinity();
+    for (const auto& g1 : c1) {
+        assert(!g1.empty());
+        for (const auto& g2 : c2) {
+            assert(!g2.empty());
+            double val_w1=w1(g1, g2);
+            double val_w2=w2(g1, g2);
+            if (val_w1<min && val_w1<val_w2)
+                min=val_w1;
+            else if (val_w2<min && val_w2<=val_w1)
+                min=val_w2;
+        }
+    }
+    return min;
 }
 
 double Partition::w1(const Group& g1, const Group& g2) {
