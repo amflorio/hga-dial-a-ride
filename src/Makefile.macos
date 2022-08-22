@@ -1,7 +1,7 @@
 SYSTEM = x86-64_osx
 LIBFORMAT = static_pic
 
-CCC = clang++ -O2 -Wall -std=c++11
+CCC = clang++ -O2 -Wall -std=c++17
 CCOPT = -m64 -fPIC -fexceptions -stdlib=libc++ -c
 
 CCLNDIRS = -L./blossom

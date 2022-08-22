@@ -2,7 +2,7 @@ SYSTEM = x86-64_linux
 LIBFORMAT = static_pic
 
 CCC = g++ -O2 -Wall
-CCOPT = -std=c++11 -m64 -fPIC -fno-strict-aliasing -fexceptions
+CCOPT = -std=c++17 -m64 -fPIC -fno-strict-aliasing -fexceptions
 
 CCLNDIRS = -L./blossom -L/home/mdflorio/boost/lib
 CCLNFLAGS = -lm -lpthread -ldl -lblossom
