@@ -10,6 +10,7 @@ class Graph {
     private:
         size_t N;                               // number of nodes
         std::vector<std::vector<double>> costs; // upper-triangular cost matrix
+        std::vector<std::pair<size_t, size_t>> bucketMatching() const;
         Tree connectTrees(const std::vector<Tree>& trees) const;
         Tree mergeCluster(const std::unordered_set<size_t>& active, size_t k)
                 const;

@@ -1,11 +1,47 @@
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <map>
 #include "blossom/PerfectMatching.h"
+#include "Config.h"
 #include "DisjointSet.h"
 #include "Graph.h"
 
 using namespace std;
+
+vector<pair<size_t, size_t>> Graph::bucketMatching() const {
+    auto my_log=[](double x){
+        return log(x)/log(1.05);    // use small base to yield more buckets
+    };
+    auto get_bucket=[&my_log](double c){
+        assert(c>=0);
+        return (int)my_log(1+c);
+    };
+    vector<pair<size_t, size_t>> matching;
+    vector<size_t> matched(N, 0);
+    int remaining=N;
+    cout<<"remaining to match: "<<remaining<<endl;
+    vector<pair<size_t, size_t>> bucket;
+    for (size_t b=0; remaining!=0; ++b) {
+        for (size_t i=0; i<N; ++i)
+            for (size_t j=i+1; j<N; ++j)
+                if (!matched[i] && !matched[j]
+                        && get_bucket(costs[i][j]/100)==b)
+                    bucket.push_back({i, j});
+        cout<<"bucket_"<<b<<": "<<bucket.size()<<endl;
+        sort(bucket.begin(), bucket.end(), [&](const auto& e1, const auto& e2)
+              {return costs[e1.first][e1.second]<costs[e2.first][e2.second];});
+        for (const auto& edge : bucket)
+            if (!matched[edge.first] && !matched[edge.second]) {
+                matching.push_back(edge);
+                matched[edge.first]=1;
+                matched[edge.second]=1;
+                remaining-=2;
+            }
+        cout<<"remaining to match after bucket "<<b<<": "<<remaining<<endl;
+    }
+    return matching;
+}
 
 Tree Graph::connectTrees(const vector<Tree>& trees) const {
     // create a graph with the contracted trees
@@ -79,18 +115,21 @@ Tree Graph::mergeCluster(const unordered_set<size_t>& active, size_t k) const {
 }
 
 vector<pair<size_t, size_t>> Graph::minCostMatching() {
-    PerfectMatching pm(N, (N*N-N)/2);   // graph is complete and undirected
-    for (size_t i=0; i<N; ++i)
-        for (size_t j=i+1; j<N; ++j)
-            pm.AddEdge(i, j, costs[i][j]);
-    pm.Solve();
-    vector<pair<size_t, size_t>> mat;
-    for (size_t i=0; i<N; ++i) {
-        size_t mat_i=pm.GetMatch(i);
-        if (i<mat_i)
-            mat.emplace_back(i, mat_i);
-    }
-    return mat;
+    if (Config::EXACT_MATCHING) {
+        PerfectMatching pm(N, (N*N-N)/2);   // graph is complete and undirected
+        for (size_t i=0; i<N; ++i)
+            for (size_t j=i+1; j<N; ++j)
+                pm.AddEdge(i, j, costs[i][j]);
+        pm.Solve();
+        vector<pair<size_t, size_t>> mat;
+        for (size_t i=0; i<N; ++i) {
+            size_t mat_i=pm.GetMatch(i);
+            if (i<mat_i)
+                mat.emplace_back(i, mat_i);
+        }
+        return mat;
+    } else
+        return bucketMatching();
 }
 
 double Graph::MSTCost() const {     // Kruskal's, return only cost
