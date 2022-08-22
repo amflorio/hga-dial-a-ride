@@ -116,7 +116,7 @@ Tree Graph::mergeCluster(const unordered_set<size_t>& active, size_t k) const {
 }
 
 vector<pair<size_t, size_t>> Graph::minCostMatching() {
-    if (Config::EXACT_MATCHING) {
+    if (N<=10000 || Config::EXACT_MATCHING) {
         PerfectMatching pm(N, (N*N-N)/2);   // graph is complete and undirected
         for (size_t i=0; i<N; ++i)
             for (size_t j=i+1; j<N; ++j)
