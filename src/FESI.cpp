@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <random>
 #include "FESI.h"
 
 namespace fesi {
@@ -89,7 +90,8 @@ void randomization() {
     for(int i=0; i<nV; ++i) {
         pi[i] = i;
     }
-    random_shuffle(pi, pi+nV);
+    auto re=default_random_engine {42};
+    shuffle(pi, pi+nV, re);
     for(int i=0; i<nV; ++i) {
         reverse_pi[pi[i]] = i;
     }
