@@ -10,36 +10,40 @@
 using namespace std;
 
 vector<pair<size_t, size_t>> Graph::bucketMatching() const {
-    auto my_log=[](double x){
+    auto my_log=[](float x){
         return log(x)/log(1.05);    // use small base to yield more buckets
     };
-    auto get_bucket=[&my_log](double c){
+    auto get_bucket=[&my_log](float c){
         assert(Config::EXACT_W1 || c>=0);
-        return (int)my_log(1+max(c, 0.0));
+        return (int)my_log(1+max(c, 0.0f));
     };
     vector<pair<size_t, size_t>> matching;
     vector<size_t> matched(N, 0);
-    int remaining=N;
-    cout<<"remaining to match: "<<remaining<<endl;
-    vector<pair<size_t, size_t>> bucket;
-    for (size_t b=0; remaining!=0; ++b) {
-        for (size_t i=0; i<N; ++i)
-            for (size_t j=i+1; j<N; ++j)
-                if (!matched[i] && !matched[j]
-                        && get_bucket(costs[i][j]/100)==b)
-                    bucket.push_back({i, j});
-        cout<<"bucket_"<<b<<": "<<bucket.size()<<endl;
-        sort(bucket.begin(), bucket.end(), [&](const auto& e1, const auto& e2)
-              {return costs[e1.first][e1.second]<costs[e2.first][e2.second];});
+    int rem=N;
+    cout<<"bucket-matching: remaining to match: "<<rem<<endl;
+    vector<vector<pair<int, int>>> buckets;
+    cout<<"bucket-matching: computing buckets ..."<<endl;
+    for (size_t i=0; i<N; ++i)
+        for (size_t j=i+1; j<N; ++j) {
+            auto b=get_bucket(cost(i, j)/100);
+            while (buckets.size()<b+1)
+                buckets.push_back({});
+            buckets[b].push_back({i, j});
+        }
+    cout<<"bucket-matching: finished computing buckets"<<rem<<endl;
+    for (size_t b=0; rem!=0; ++b) {
+        assert(b<buckets.size());
+        auto& bucket=buckets[b];
+        cout<<"buckets["<<b<<"].size(): "<<buckets[b].size()<<endl;
         for (const auto& edge : bucket)
             if (!matched[edge.first] && !matched[edge.second]) {
                 matching.push_back(edge);
                 matched[edge.first]=1;
                 matched[edge.second]=1;
-                remaining-=2;
+                rem-=2;
             }
-        cout<<"remaining to match after bucket "<<b<<": "<<remaining<<endl;
         bucket.clear();
+        cout<<"after bucket "<<b<<": remaining to match: "<<rem<<endl;
     }
     return matching;
 }
@@ -51,8 +55,8 @@ Tree Graph::connectTrees(const vector<Tree>& trees) const {
     map<pair<size_t, size_t>, pair<size_t, size_t>> mymap;
     for (size_t i=0; i<trees.size(); ++i) {
         for (size_t j=i+1; j<trees.size(); ++j) {
-            tuple<size_t, size_t, double> mincost
-                    {0, 0, numeric_limits<double>::infinity()};
+            tuple<size_t, size_t, float> mincost
+                    {0, 0, numeric_limits<float>::infinity()};
             for (auto node_i : trees[i].nodes())
                 for (auto node_j : trees[j].nodes())
                     if (edgeCost(node_i, node_j)<get<2>(mincost))
@@ -84,12 +88,12 @@ Tree Graph::mergeCluster(const unordered_set<size_t>& active, size_t k) const {
     DisjointSet dset(N);        // we could use much less memory here
     while (true) {
         // merge two components, Kruskal's style
-        tuple<double,size_t,size_t> mincost
-                {numeric_limits<double>::infinity(), 0, 0};
+        tuple<float,size_t,size_t> mincost
+                {numeric_limits<float>::infinity(), 0, 0};
         for (const auto i : active)
             for (const auto j : active)
                 if (dset.findSet(i)!=dset.findSet(j)) {
-                    double c=edgeCost(i,j)/min(dset.sizeSet(i),dset.sizeSet(j));
+                    float c=edgeCost(i,j)/min(dset.sizeSet(i),dset.sizeSet(j));
                     if (c<get<0>(mincost))
                         mincost={c, i, j};      // TODO: make it i, j, c
                 }
@@ -120,7 +124,7 @@ vector<pair<size_t, size_t>> Graph::minCostMatching() {
         PerfectMatching pm(N, (N*N-N)/2);   // graph is complete and undirected
         for (size_t i=0; i<N; ++i)
             for (size_t j=i+1; j<N; ++j)
-                pm.AddEdge(i, j, costs[i][j]);
+                pm.AddEdge(i, j, cost(i, j));
         pm.Solve();
         vector<pair<size_t, size_t>> mat;
         for (size_t i=0; i<N; ++i) {
@@ -133,23 +137,23 @@ vector<pair<size_t, size_t>> Graph::minCostMatching() {
         return bucketMatching();
 }
 
-double Graph::MSTCost() const {     // Kruskal's, return only cost
+float Graph::MSTCost() const {      // Kruskal's, return only cost
     vector<pair<size_t, size_t>> edges;
     for (size_t i=0; i<N; ++i)
         for (size_t j=i+1; j<N; ++j)
             edges.emplace_back(i, j);
     sort(edges.begin(), edges.end(),
             [&](const pair<size_t, size_t>& e1, const pair<size_t, size_t>& e2)
-            {return costs[e1.first][e1.second]<costs[e2.first][e2.second];});
+            {return cost(e1.first, e1.second)<cost(e2.first, e2.second);});
     DisjointSet dset(N);
-    double cost=0;
+    float cst=0;
     for (size_t i=0, added=0; added<N-1; ++i)
         if (dset.findSet(edges[i].first)!=dset.findSet(edges[i].second)) {
-            cost+=costs[edges[i].first][edges[i].second];
+            cst+=cost(edges[i].first, edges[i].second);
             dset.unionSet(edges[i].first, edges[i].second);
             added++;
         }
-    return cost;
+    return cst;
 }
 
 Tree Graph::MST() const {       // Kruskal's, return solution tree
@@ -159,12 +163,12 @@ Tree Graph::MST() const {       // Kruskal's, return solution tree
             edges.emplace_back(i, j);
     sort(edges.begin(), edges.end(),
             [&](const pair<size_t, size_t>& e1, const pair<size_t, size_t>& e2)
-            {return costs[e1.first][e1.second]<costs[e2.first][e2.second];});
+            {return cost(e1.first, e1.second)<cost(e2.first, e2.second);});
     DisjointSet dset(N);
     Tree sol {0, {}};
     for (size_t i=0, added=0; added<N-1; ++i)
         if (dset.findSet(edges[i].first)!=dset.findSet(edges[i].second)) {
-            sol.cost+=costs[edges[i].first][edges[i].second];
+            sol.cost+=cost(edges[i].first, edges[i].second);
             sol.edges.emplace_back(edges[i].first, edges[i].second);
             dset.unionSet(edges[i].first, edges[i].second);
             added++;
@@ -176,25 +180,25 @@ Tree Graph::unrootedKMST(const size_t k) const {
     assert(k>=2);
     if (k>N) {
         //cout<<"unrootedKMST: k="<<k<<" ;  N="<<N<<"  (infeasible)"<<endl;
-        return {numeric_limits<double>::infinity(), {}};
+        return {numeric_limits<float>::infinity(), {}};
     }
     if (k==N) {
         //cout<<"unrootedKMST: k="<<k<<" ;  N="<<N<<"  =>  MST"<<endl;
         return MST();
     }
-    Tree bestmst {numeric_limits<double>::infinity(), {}};
+    Tree bestmst {numeric_limits<float>::infinity(), {}};
     for (size_t root=0; root<N; ++root) {
-        vector<double> root_dists;
+        vector<float> root_dists;
         for (size_t i=0; i<N; ++i)
             root_dists.push_back(edgeCost(i, root));
         nth_element(root_dists.begin(),root_dists.begin()+k-1,root_dists.end());
-        const double theta=max(root_dists[k-1], 1e-5);
+        const float theta=max(root_dists[k-1], 1e-5f);
         //cout<<"root="<<root<<": distance to "<<k<<"th nearest: "<<theta<<endl;
-        for (double l=theta; l<=k*theta; l*=2) {
+        for (float l=theta; l<=k*theta; l*=2) {
             //cout<<"guessing root="<<root<<" ;  l="<<l<<endl;
             unordered_set<size_t> active;
             for (size_t i=0; i<N; ++i)
-                if (costs[root][i]<=l)
+                if (cost(root, i)<=l)
                     active.insert(i);
             size_t k_rem=k;
             vector<Tree> trees;
