@@ -30,7 +30,7 @@ vector<pair<size_t, size_t>> Graph::bucketMatching() const {
                 buckets.push_back({});
             buckets[b].push_back({i, j});
         }
-    cout<<"bucket-matching: finished computing buckets"<<rem<<endl;
+    cout<<"bucket-matching: finished computing buckets"<<endl;
     for (size_t b=0; rem!=0; ++b) {
         assert(b<buckets.size());
         auto& bucket=buckets[b];
