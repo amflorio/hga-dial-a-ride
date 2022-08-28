@@ -83,7 +83,7 @@ vector<Route> AssignmentPG::assignment(const vector<Group>& groups) {
                     costs[j][i]=costs[i][j];
                 }
             TSPHeuristic tsp(costs);
-            auto tspsol=tsp.cheapestInsertion();
+            auto tspsol=tsp.randomInsertion();
             cout<<"TSP cost: "<<tspsol.cost()<<endl;
             assert(tspsol.tour().size()==costs.size());
             auto tour=tspsol.tour();
