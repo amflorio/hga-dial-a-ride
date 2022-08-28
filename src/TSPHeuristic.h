@@ -12,6 +12,7 @@ class TSPHeuristic {
         TSPHeuristic(std::vector<std::vector<double>> csts)
                 : costs{std::move(csts)} {}
         TSPSolution cheapestInsertion() const;
+        TSPSolution randomInsertion() const;
 };
 
 #endif
