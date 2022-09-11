@@ -130,13 +130,14 @@ int main(int argc, char* argv[]) {
     checkFeasible(I, routes);
     cout<<"kelinPG: "<<routes.size()<<" route(s)"<<endl;
     csvOutput(I, "HGA", routes, sw.elapsedSeconds());
-    /*
+    /* commenting-out partition from Lambda-forest as it's very inneficient
     // partition from Lambda-forest algorithm
     sw=Stopwatch();
     groups=PartitionLambdaForest::partition();
-    c=Assignment::assignment(groups);
-    cout<<"k-forest,"<<I->requests().size()<<","<<I->drivers().size()<<","
-            <<I->capacity()<<","<<c<<","<<sw.elapsedSeconds()<<endl;
+    routes=AssignmentPG::assignment(groups);
+    checkFeasible(I, routes);
+    cout<<"k-forest: "<<routes.size()<<" route(s)"<<endl;
+    csvOutput(I, "k-forest", routes, sw.elapsedSeconds());
     */
     // prune-greedy DP
     sw=Stopwatch();
