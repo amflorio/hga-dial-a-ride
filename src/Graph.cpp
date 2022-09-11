@@ -190,7 +190,7 @@ Tree Graph::unrootedKMST(const size_t k) const {
     for (size_t root=0; root<N; ++root) {
         vector<float> root_dists;
         for (size_t i=0; i<N; ++i)
-            root_dists.push_back(edgeCost(i, root));
+            root_dists.push_back(i!=root?edgeCost(i, root):0);
         nth_element(root_dists.begin(),root_dists.begin()+k-1,root_dists.end());
         const float theta=max(root_dists[k-1], 1e-5f);
         //cout<<"root="<<root<<": distance to "<<k<<"th nearest: "<<theta<<endl;
@@ -198,7 +198,7 @@ Tree Graph::unrootedKMST(const size_t k) const {
             //cout<<"guessing root="<<root<<" ;  l="<<l<<endl;
             unordered_set<size_t> active;
             for (size_t i=0; i<N; ++i)
-                if (cost(root, i)<=l)
+                if ((i!=root?edgeCost(root, i):0)<=l)
                     active.insert(i);
             size_t k_rem=k;
             vector<Tree> trees;
