@@ -6,7 +6,7 @@ This repository contains the source code and datasets to allow the replication o
 [1] **Luo, K., Florio, A.M., Das, S., Guo, X. (2023). A Hierarchical Grouping Algorithm for the Multi-Vehicle Dial-a-Ride Problem. Proceedings of the VLDB Endowment.**
 
 ## Building and Running
-For reference, we provide two `Makefile`'s: one for MacOS (`Makefile.macos`) and one for Linux (`Makefile.linux`). These should be adapted to match the specific host requirements. For licensing reasons, some dependencies cannot be included in this repository (see [Dependencies](#deps) below). The code compiles into a single executable `main`. The app allows several command line options:
+For reference, we provide two `Makefile`'s: one for MacOS (`Makefile.macos`) and one for Linux (`Makefile.linux`). These should be adapted to match the specific host requirements. For licensing reasons, some dependencies cannot be included in this repository (see [Dependencies](#deps) below). The code compiles into a single executable file named `main`. The app allows several command line options:
 
 ```
 $ ./main
@@ -26,7 +26,7 @@ $ ./main ny 50000 200 8 >> hga2.out
 
 The app outputs progress, as the different steps and iterations of the algorithm are executed. Since the app is output intensive, we recommend redirecting `stdout` to a given file, as indicated above. Note: especially in larger instances (50,000 requests and more), the algorithm may take several minutes for finalizing.
 
-The results are printed in comma-separated lines, as follows:
+The final results of 2-HGA and benchmarks are printed in comma-separated lines, as follows:
 
 ```
 HGA,NY,10000,200,8,1.26831e+07,87,3.60978e+06,4.62051e+07,87.979
