@@ -18,20 +18,21 @@ where <network> is:
 	'sy-g' for synthetic data, mixed Gaussian model
 ```
 
-For example, to run 2-HGA on the New York instance with 50,000 requests, 200 drivers and a van capacity of 8:
+For example, to run 2-HGA on the New York instance with 10,000 requests, 200 drivers and a van capacity of 8:
 
 ```
-$ ./main ny 50000 200 8 >> hga2.out
+$ ./main ny 10000 200 8 >> ny_10000_200_8.out
 ```
 
-The app outputs progress, as the different steps and iterations of the algorithm are executed. Since the app is output intensive, we recommend redirecting `stdout` to a given file, as indicated above. Note: especially in larger instances (50,000 requests and more), the algorithm may take several minutes for finalizing.
+The app outputs progress, as the different steps and iterations of the algorithm are executed. Since the app is output intensive, we recommend redirecting `stdout` to a given file, as indicated above. Note: especially in larger instances (10,000 requests or more), the algorithm may take a few to several minutes before finalizing. It is recommended to toggle heuristic mode on (see below) before running such large instances.
 
-The final results of 2-HGA and benchmarks are printed in comma-separated lines, as follows:
+The final results of 2-HGA and benchmarks are printed in CSV-lines, as follows:
 
 ```
-HGA,NY,10000,200,8,1.26831e+07,87,3.60978e+06,4.62051e+07,87.979
-pruneGDP,NY,10000,200,8,1.48831e+07,102,508027,1.07037e+08,18.227
-FESI,NY,10000,200,8,2.29595e+07,200,145465,1.07609e+08,8.5792
+$ grep 'NY' ny_10000_200_8.out
+HGA,NY,10000,200,8,1.24316e+07,81,2.47447e+06,4.58064e+07,447.53
+pruneGDP,NY,10000,200,8,1.48831e+07,102,508027,1.07037e+08,18.085
+FESI,NY,10000,200,8,2.28268e+07,200,147394,1.07597e+08,8.5832
 ```
 
 In order, each field contains the following information: algorithm (e.g., 'HGA'), instance code (e.g., 'NY'), # of requests, # of drivers, van capacity, total travel time, # of routes in the solution, makespan, total latency, time elapsed (in seconds).
