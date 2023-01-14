@@ -1,4 +1,6 @@
 /**
+ * Implementation obtained from https://github.com/BUAA-BDA/ridesharing-LMD
+ *
 	\Author: Trasier
 	\Date:	2019/05/21
 **/
