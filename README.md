@@ -3,7 +3,7 @@
 ## Description
 This repository contains the source code and datasets to allow the replication of the results from the paper:
 
-[1] **Luo, K., Florio, A.M., Das, S., Guo, X. (2023). A Hierarchical Grouping Algorithm for the Multi-Vehicle Dial-a-Ride Problem. Proceedings of the VLDB Endowment.**
+[1] **Luo, K., Florio, A.M., Das, S., Guo, X. (2023). A Hierarchical Grouping Algorithm for the Multi-Vehicle Dial-a-Ride Problem. Proceedings of the VLDB Endowment (PVLDB), 16(5): 1195-1207. doi:10.14778/3579075.3579091**
 
 ## Building and Running
 For reference, we provide two `Makefile`'s: one for MacOS (`Makefile.macos`) and one for Linux (`Makefile.linux`). These should be adapted to match the specific host requirements. For licensing reasons, some dependencies cannot be included in this repository (see [Dependencies](#deps) below). The code compiles into a single executable file named `main`. The app allows several command line options:
